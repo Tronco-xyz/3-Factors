@@ -5,6 +5,8 @@ import streamlit as st
 
 # Función para calcular el rendimiento
 def calculate_return(prices, period):
+    if len(prices) < 2:
+        raise ValueError("No hay suficientes datos para calcular el rendimiento.")
     return ((prices[-1] - prices[0]) / prices[0]) * 100
 
 # Función para calcular la volatilidad
