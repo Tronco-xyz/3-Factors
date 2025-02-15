@@ -114,3 +114,4 @@ else:
             st.dataframe(results_df)
         else:
             st.write("No se encontraron resultados para los tickers proporcionados.")
+            
