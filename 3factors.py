@@ -15,11 +15,11 @@ def calculate_volatility(prices, period):
     if len(prices) < 2:
         raise ValueError("No hay suficientes datos para calcular la volatilidad.")
     daily_returns = np.diff(prices) / prices[:-1]
-    return np.std(daily_returns) * 100
+    return np.std(daily_returns) * 100  # Convertir a porcentaje
 
 # Función para normalizar valores
 def normalize(value, min_value, max_value):
-    return ((value - min_value) / (max_value - min_value)) * 100  # Cambiado a 100
+    return ((value - min_value) / (max_value - min_value)) * 99
 
 # Función para convertir períodos a días
 def convert_period_to_days(period):
@@ -119,14 +119,5 @@ else:
             results_df = pd.DataFrame(results)
             st.write("Resultados:")
             st.dataframe(results_df)
-
-            # Botón para descargar resultados
-            csv = results_df.to_csv(index=False).encode('utf-8')
-            st.download_button(
-                label="Descargar resultados en CSV",
-                data=csv,
-                file_name="resultados_screener.csv",
-                mime="text/csv"
-            )
         else:
             st.write("No se encontraron resultados para los tickers proporcionados.")
