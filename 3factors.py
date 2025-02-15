@@ -65,10 +65,10 @@ def calculate_rating(ticker, returnA_period, returnB_period, volatility_period, 
 
         return {
             "Symbol": ticker,
-            "ReturnA": returnA,
-            "ReturnB": returnB,
-            "Volatility": volatility,
-            "RS Rating": rating
+            "ReturnA": round(returnA, 2),
+            "ReturnB": round(returnB, 2),
+            "Volatility": round(volatility, 2),
+            "RS Rating": round(rating, 2)
         }
     except Exception as e:
         st.warning(f"Error al procesar {ticker}: {str(e)}")
@@ -121,4 +121,3 @@ else:
             st.dataframe(results_df)
         else:
             st.write("No se encontraron resultados para los tickers proporcionados.")
-            
