@@ -4,7 +4,7 @@ import numpy as np
 import streamlit as st
 
 # Configuración del tema oscuro
-st.set_page_config(page_title="ETF/Stock Screener", layout="wide", initial_sidebar_state="expanded", theme="dark")
+st.set_page_config(page_title="ETF/Stock Screener", layout="wide", initial_sidebar_state="expanded")
 
 # Función para calcular el rendimiento
 def calculate_return(prices, period):
