@@ -40,7 +40,7 @@ def calculate_rating(ticker, returnA_period, returnB_period, volatility_period, 
 
         # Obtener datos históricos
         data = yf.download(ticker, period=f"{max(returnA_days, returnB_days, volatility_days)}d")
-        prices = data['Close'].values
+        prices = data['Close'].values.flatten()  # Asegurarse de que prices sea un array unidimensional
 
         # Verificar si hay suficientes datos
         if len(prices) < max(returnA_days, returnB_days, volatility_days):
