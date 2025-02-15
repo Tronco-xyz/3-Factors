@@ -62,7 +62,14 @@ def calculate_rating(ticker, returnA_period, returnB_period, volatility_period, 
 
         # Calcular rating
         rating = (returnA_norm * weight_returnA) + (returnB_norm * weight_returnB) + (volatility_norm * weight_volatility)
-        return rating
+
+        return {
+            "Symbol": ticker,
+            "ReturnA": returnA,
+            "ReturnB": returnB,
+            "Volatility": volatility,
+            "RS Rating": rating
+        }
     except Exception as e:
         st.warning(f"Error al procesar {ticker}: {str(e)}")
         return None
@@ -103,9 +110,9 @@ else:
     if st.button("Calcular Rating"):
         results = []
         for ticker in tickers:
-            rating = calculate_rating(ticker, returnA_period, returnB_period, volatility_period, weight_returnA, weight_returnB, weight_volatility)
-            if rating is not None:
-                results.append({"Ticker": ticker, "Rating": rating})
+            result = calculate_rating(ticker, returnA_period, returnB_period, volatility_period, weight_returnA, weight_returnB, weight_volatility)
+            if result is not None:
+                results.append(result)
 
         # Mostrar resultados en una tabla
         if results:
