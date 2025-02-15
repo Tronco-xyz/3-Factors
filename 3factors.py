@@ -3,6 +3,9 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 
+# Configuración del tema oscuro
+st.set_page_config(page_title="ETF/Stock Screener", layout="wide", initial_sidebar_state="expanded", theme="dark")
+
 # Función para calcular el rendimiento
 def calculate_return(prices, period):
     return ((prices[-1] - prices[0]) / prices[0]) * 100
@@ -42,6 +45,9 @@ def calculate_rating(ticker, returnA_period, returnB_period, volatility_period, 
         # Verificar si hay suficientes datos
         if len(prices) < max(returnA_days, returnB_days, volatility_days):
             raise ValueError(f"No hay suficientes datos para {ticker} en el período seleccionado.")
+
+        # Asegurarse de que los arrays tengan la misma longitud
+        prices = prices[-max(returnA_days, returnB_days, volatility_days):]
 
         # Calcular ReturnA
         returnA = calculate_return(prices[-returnA_days:], returnA_days)
