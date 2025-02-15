@@ -2,13 +2,14 @@ import pandas as pd
 import yfinance as yf
 import numpy as np
 
-# List of tickers to screen
-tickers = ['AAPL', 'MSFT', 'GOOGL', 'SPY', 'QQQ', 'VTI']
-
-# Function to calculate relative strength and volatility
 def calculate_metrics(ticker, period_short=3*21, period_long=6*21):
     # Fetch historical data
     data = yf.download(ticker, period='1y', interval='1d')
+
+    # Check if 'Adj Close' is in the DataFrame
+    if 'Adj Close' not in data.columns:
+        print(f"'Adj Close' data not available for {ticker}")
+        return None
 
     # Calculate returns
     data['Return'] = data['Adj Close'].pct_change()
@@ -27,12 +28,16 @@ def calculate_metrics(ticker, period_short=3*21, period_long=6*21):
     latest = data.iloc[-1]
     return latest[['Return_Short', 'Return_Long', 'Volatility', 'Relative_Strength']]
 
+# List of tickers to screen
+tickers = ['AAPL', 'MSFT', 'GOOGL', 'SPY', 'QQQ', 'VTI']
+
 # Screen the tickers
 results = []
 for ticker in tickers:
     metrics = calculate_metrics(ticker)
-    metrics['Ticker'] = ticker
-    results.append(metrics)
+    if metrics is not None:
+        metrics['Ticker'] = ticker
+        results.append(metrics)
 
 # Convert results to DataFrame
 results_df = pd.DataFrame(results)
@@ -41,4 +46,3 @@ results_df = pd.DataFrame(results)
 results_df = results_df.sort_values(by='Relative_Strength', ascending=False)
 
 print(results_df)
-
