@@ -15,7 +15,7 @@ def calculate_volatility(prices, period):
     if len(prices) < 2:
         raise ValueError("No hay suficientes datos para calcular la volatilidad.")
     daily_returns = np.diff(prices) / prices[:-1]
-    return np.std(daily_returns) * 100  # Convertir a porcentaje
+    return np.std(daily_returns) * np.sqrt(252) * 100  # Anualizar y convertir a porcentaje
 
 # Función para normalizar valores
 def normalize(value, min_value, max_value):
