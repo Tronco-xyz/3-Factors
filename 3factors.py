@@ -16,20 +16,34 @@ def calculate_volatility(prices, period):
 def normalize(value, min_value, max_value):
     return ((value - min_value) / (max_value - min_value)) * 100
 
+# Función para convertir períodos a días
+def convert_period_to_days(period):
+    if "day" in period:
+        return int(period.split()[0])
+    elif "month" in period:
+        return int(period.split()[0]) * 30
+    else:
+        raise ValueError("Período no válido")
+
 # Función principal para calcular el rating
 def calculate_rating(ticker, returnA_period, returnB_period, volatility_period, weight_returnA, weight_returnB, weight_volatility):
+    # Convertir períodos a días
+    returnA_days = convert_period_to_days(returnA_period)
+    returnB_days = convert_period_to_days(returnB_period)
+    volatility_days = convert_period_to_days(volatility_period)
+
     # Obtener datos históricos
-    data = yf.download(ticker, period=f"{max(returnA_period, returnB_period, volatility_period)}d")
+    data = yf.download(ticker, period=f"{max(returnA_days, returnB_days, volatility_days)}d")
     prices = data['Close'].values
 
     # Calcular ReturnA
-    returnA = calculate_return(prices[-returnA_period:], returnA_period)
+    returnA = calculate_return(prices[-returnA_days:], returnA_days)
 
     # Calcular ReturnB
-    returnB = calculate_return(prices[-returnB_period:], returnB_period)
+    returnB = calculate_return(prices[-returnB_days:], returnB_days)
 
     # Calcular Volatilidad
-    volatility = calculate_volatility(prices[-volatility_period:], volatility_period)
+    volatility = calculate_volatility(prices[-volatility_days:], volatility_days)
 
     # Normalizar valores (ejemplo con valores mínimos y máximos hipotéticos)
     returnA_norm = normalize(returnA, min_value=-5, max_value=10)
@@ -50,23 +64,23 @@ tickers = [ticker.strip() for ticker in tickers.split(",")]
 
 # Configuración de ReturnA
 st.subheader("Configuración de ReturnA")
-returnA_period = st.selectbox("Período para ReturnA:", [1, 2, 5, 10, 20, 30], index=2)
-weight_returnA = st.number_input("Peso para ReturnA (%):", min_value=0.0, max_value=100.0, value=40.0, step=1.0)
+returnA_period = st.selectbox("Período para ReturnA:", ["1 day", "5 days", "10 days", "20 days", "3 months", "6 months", "12 months", "24 months"])
+weight_returnA = st.number_input("Peso para ReturnA (%):", min_value=0.0, max_value=100.0, value=40.0, step=0.01, format="%.2f")
 
 # Configuración de ReturnB
 st.subheader("Configuración de ReturnB")
-returnB_period = st.selectbox("Período para ReturnB:", [1, 2, 5, 10, 20, 30], index=2)
-weight_returnB = st.number_input("Peso para ReturnB (%):", min_value=0.0, max_value=100.0, value=30.0, step=1.0)
+returnB_period = st.selectbox("Período para ReturnB:", ["1 day", "5 days", "10 days", "20 days", "3 months", "6 months", "12 months", "24 months"])
+weight_returnB = st.number_input("Peso para ReturnB (%):", min_value=0.0, max_value=100.0, value=30.0, step=0.01, format="%.2f")
 
 # Configuración de Volatilidad
 st.subheader("Configuración de Volatilidad")
-volatility_period = st.selectbox("Período para Volatilidad:", [1, 2, 5, 10, 20, 30], index=2)
-weight_volatility = st.number_input("Peso para Volatilidad (%):", min_value=0.0, max_value=100.0, value=30.0, step=1.0)
+volatility_period = st.selectbox("Período para Volatilidad:", ["1 day", "5 days", "10 days", "20 days", "3 months", "6 months", "12 months", "24 months"])
+weight_volatility = st.number_input("Peso para Volatilidad (%):", min_value=0.0, max_value=100.0, value=30.0, step=0.01, format="%.2f")
 
 # Verificar que la suma de los pesos sea 100%
 total_weight = weight_returnA + weight_returnB + weight_volatility
 if abs(total_weight - 100.0) > 0.0001:
-    st.error(f"La suma de los pesos debe ser 100%. Actual: {total_weight}%")
+    st.error(f"La suma de los pesos debe ser 100%. Actual: {total_weight:.2f}%")
 else:
     # Convertir pesos a decimales
     weight_returnA /= 100.0
