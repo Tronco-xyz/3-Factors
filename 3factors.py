@@ -46,9 +46,6 @@ def calculate_rating(ticker, returnA_period, returnB_period, volatility_period, 
         if len(prices) < max(returnA_days, returnB_days, volatility_days):
             raise ValueError(f"No hay suficientes datos para {ticker} en el período seleccionado.")
 
-        # Asegurarse de que los arrays tengan la misma longitud
-        prices = prices[-max(returnA_days, returnB_days, volatility_days):]
-
         # Calcular ReturnA
         returnA = calculate_return(prices[-returnA_days:], returnA_days)
 
