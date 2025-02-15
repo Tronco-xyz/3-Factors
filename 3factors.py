@@ -9,6 +9,8 @@ def calculate_return(prices, period):
 
 # Función para calcular la volatilidad
 def calculate_volatility(prices, period):
+    if len(prices) < 2:
+        raise ValueError("No hay suficientes datos para calcular la volatilidad.")
     daily_returns = np.diff(prices) / prices[:-1]
     return np.std(daily_returns) * 100
 
@@ -27,32 +29,40 @@ def convert_period_to_days(period):
 
 # Función principal para calcular el rating
 def calculate_rating(ticker, returnA_period, returnB_period, volatility_period, weight_returnA, weight_returnB, weight_volatility):
-    # Convertir períodos a días
-    returnA_days = convert_period_to_days(returnA_period)
-    returnB_days = convert_period_to_days(returnB_period)
-    volatility_days = convert_period_to_days(volatility_period)
+    try:
+        # Convertir períodos a días
+        returnA_days = convert_period_to_days(returnA_period)
+        returnB_days = convert_period_to_days(returnB_period)
+        volatility_days = convert_period_to_days(volatility_period)
 
-    # Obtener datos históricos
-    data = yf.download(ticker, period=f"{max(returnA_days, returnB_days, volatility_days)}d")
-    prices = data['Close'].values
+        # Obtener datos históricos
+        data = yf.download(ticker, period=f"{max(returnA_days, returnB_days, volatility_days)}d")
+        prices = data['Close'].values
 
-    # Calcular ReturnA
-    returnA = calculate_return(prices[-returnA_days:], returnA_days)
+        # Verificar si hay suficientes datos
+        if len(prices) < max(returnA_days, returnB_days, volatility_days):
+            raise ValueError(f"No hay suficientes datos para {ticker} en el período seleccionado.")
 
-    # Calcular ReturnB
-    returnB = calculate_return(prices[-returnB_days:], returnB_days)
+        # Calcular ReturnA
+        returnA = calculate_return(prices[-returnA_days:], returnA_days)
 
-    # Calcular Volatilidad
-    volatility = calculate_volatility(prices[-volatility_days:], volatility_days)
+        # Calcular ReturnB
+        returnB = calculate_return(prices[-returnB_days:], returnB_days)
 
-    # Normalizar valores (ejemplo con valores mínimos y máximos hipotéticos)
-    returnA_norm = normalize(returnA, min_value=-5, max_value=10)
-    returnB_norm = normalize(returnB, min_value=-10, max_value=20)
-    volatility_norm = normalize(volatility, min_value=0.5, max_value=5)
+        # Calcular Volatilidad
+        volatility = calculate_volatility(prices[-volatility_days:], volatility_days)
 
-    # Calcular rating
-    rating = (returnA_norm * weight_returnA) + (returnB_norm * weight_returnB) + (volatility_norm * weight_volatility)
-    return rating
+        # Normalizar valores (ejemplo con valores mínimos y máximos hipotéticos)
+        returnA_norm = normalize(returnA, min_value=-5, max_value=10)
+        returnB_norm = normalize(returnB, min_value=-10, max_value=20)
+        volatility_norm = normalize(volatility, min_value=0.5, max_value=5)
+
+        # Calcular rating
+        rating = (returnA_norm * weight_returnA) + (returnB_norm * weight_returnB) + (volatility_norm * weight_volatility)
+        return rating
+    except Exception as e:
+        st.warning(f"Error al procesar {ticker}: {str(e)}")
+        return None
 
 # Interfaz de Streamlit
 st.title("ETF/Stock Screener")
@@ -90,11 +100,9 @@ else:
     if st.button("Calcular Rating"):
         results = []
         for ticker in tickers:
-            try:
-                rating = calculate_rating(ticker, returnA_period, returnB_period, volatility_period, weight_returnA, weight_returnB, weight_volatility)
+            rating = calculate_rating(ticker, returnA_period, returnB_period, volatility_period, weight_returnA, weight_returnB, weight_volatility)
+            if rating is not None:
                 results.append({"Ticker": ticker, "Rating": rating})
-            except Exception as e:
-                st.error(f"Error al procesar {ticker}: {e}")
 
         # Mostrar resultados en una tabla
         if results:
