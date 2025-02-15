@@ -1,14 +1,19 @@
+import streamlit as st
 import pandas as pd
 import yfinance as yf
 import numpy as np
 
+# Function to calculate relative strength and volatility
 def calculate_metrics(ticker, period_short=3*21, period_long=6*21):
     # Fetch historical data
     data = yf.download(ticker, period='1y', interval='1d')
 
+    # Debug: Print columns to check data availability
+    st.write(f"Columns for {ticker}: {data.columns}")
+
     # Check if 'Adj Close' is in the DataFrame
     if 'Adj Close' not in data.columns:
-        print(f"'Adj Close' data not available for {ticker}")
+        st.error(f"'Adj Close' data not available for {ticker}")
         return None
 
     # Calculate returns
@@ -45,4 +50,5 @@ results_df = pd.DataFrame(results)
 # Sort by relative strength
 results_df = results_df.sort_values(by='Relative_Strength', ascending=False)
 
-print(results_df)
+# Display results in Streamlit
+st.dataframe(results_df)
