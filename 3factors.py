@@ -51,22 +51,28 @@ tickers = [ticker.strip() for ticker in tickers.split(",")]
 # Configuración de ReturnA
 st.subheader("Configuración de ReturnA")
 returnA_period = st.selectbox("Período para ReturnA:", [1, 2, 5, 10, 20, 30], index=2)
-weight_returnA = st.number_input("Peso para ReturnA (ej: 0.4):", min_value=0.0, max_value=1.0, value=0.4, step=0.1)
+weight_returnA = st.number_input("Peso para ReturnA (%):", min_value=0.0, max_value=100.0, value=40.0, step=1.0)
 
 # Configuración de ReturnB
 st.subheader("Configuración de ReturnB")
 returnB_period = st.selectbox("Período para ReturnB:", [1, 2, 5, 10, 20, 30], index=2)
-weight_returnB = st.number_input("Peso para ReturnB (ej: 0.3):", min_value=0.0, max_value=1.0, value=0.3, step=0.1)
+weight_returnB = st.number_input("Peso para ReturnB (%):", min_value=0.0, max_value=100.0, value=30.0, step=1.0)
 
 # Configuración de Volatilidad
 st.subheader("Configuración de Volatilidad")
 volatility_period = st.selectbox("Período para Volatilidad:", [1, 2, 5, 10, 20, 30], index=2)
-weight_volatility = st.number_input("Peso para Volatilidad (ej: 0.3):", min_value=0.0, max_value=1.0, value=0.3, step=0.1)
+weight_volatility = st.number_input("Peso para Volatilidad (%):", min_value=0.0, max_value=100.0, value=30.0, step=1.0)
 
-# Verificar que la suma de los pesos sea 1
-if abs((weight_returnA + weight_returnB + weight_volatility) - 1.0) > 0.0001:
-    st.error("La suma de los pesos debe ser igual a 1. Ajusta los pesos.")
+# Verificar que la suma de los pesos sea 100%
+total_weight = weight_returnA + weight_returnB + weight_volatility
+if abs(total_weight - 100.0) > 0.0001:
+    st.error(f"La suma de los pesos debe ser 100%. Actual: {total_weight}%")
 else:
+    # Convertir pesos a decimales
+    weight_returnA /= 100.0
+    weight_returnB /= 100.0
+    weight_volatility /= 100.0
+
     if st.button("Calcular Rating"):
         results = []
         for ticker in tickers:
