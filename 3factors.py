@@ -55,10 +55,10 @@ def calculate_rating(ticker, returnA_period, returnB_period, volatility_period, 
         # Calcular Volatilidad
         volatility = calculate_volatility(prices[-volatility_days:], volatility_days)
 
-        # Normalizar valores (ejemplo con valores mínimos y máximos hipotéticos)
-        returnA_norm = normalize(returnA, min_value=-5, max_value=10)
-        returnB_norm = normalize(returnB, min_value=-10, max_value=20)
-        volatility_norm = normalize(volatility, min_value=0.5, max_value=5)
+        # Normalizar valores (ajustar los valores mínimos y máximos según sea necesario)
+        returnA_norm = normalize(returnA, min_value=-50, max_value=100)
+        returnB_norm = normalize(returnB, min_value=-50, max_value=100)
+        volatility_norm = normalize(volatility, min_value=0, max_value=100)
 
         # Calcular rating
         rating = (returnA_norm * weight_returnA) + (returnB_norm * weight_returnB) + (volatility_norm * weight_volatility)
