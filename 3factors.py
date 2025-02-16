@@ -2,6 +2,7 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 import streamlit as st
+import datetime
 
 # Configuración del tema oscuro
 st.set_page_config(page_title="ETF/Stock Screener", layout="wide", initial_sidebar_state="expanded")
@@ -39,12 +40,15 @@ def calculate_rating(ticker, returnA_period, returnB_period, volatility_period, 
         volatility_days = convert_period_to_days(volatility_period)
 
         # Obtener datos históricos
-        data = yf.download(ticker, period=f"{max(returnA_days, returnB_days, volatility_days)}d")
-        prices = data['Close'].values.flatten()  # Asegurarse de que prices sea un array unidimensional
+        end_date = datetime.datetime.now()
+        start_date = end_date - datetime.timedelta(days=max(returnA_days, returnB_days, volatility_days))
+        data = yf.download(ticker, start=start_date, end=end_date)
 
         # Verificar si hay suficientes datos
-        if len(prices) < max(returnA_days, returnB_days, volatility_days):
+        if len(data) < max(returnA_days, returnB_days, volatility_days):
             raise ValueError(f"No hay suficientes datos para {ticker} en el período seleccionado.")
+
+        prices = data['Close'].values.flatten()  # Asegurarse de que prices sea un array unidimensional
 
         # Calcular ReturnA
         returnA = calculate_return(prices[-returnA_days:], returnA_days)
